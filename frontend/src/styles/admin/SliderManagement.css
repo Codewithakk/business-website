@@ -1,0 +1,122 @@
+.slider-management-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.slider-header h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1f2937;
+}
+
+.add-slide-button {
+    background-color: #3b82f6;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+}
+
+.add-slide-button:hover {
+    background-color: #2563eb;
+}
+
+.button-icon {
+    margin-right: 8px;
+}
+
+.slides-table-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.slides-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.slides-table th {
+    background-color: #f9fafb;
+    padding: 12px 20px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.slides-table td {
+    padding: 16px 20px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 14px;
+    color: #4b5563;
+}
+
+.slide-image {
+    height: 80px;
+    width: auto;
+}
+
+.toggle-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    font-size: 20px;
+}
+
+.toggle-on {
+    color: #10b981;
+}
+
+.toggle-off {
+    color: #ef4444;
+}
+
+.edit-button,
+.delete-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 12px;
+}
+
+.edit-button {
+    color: #3b82f6;
+}
+
+.edit-button:hover {
+    color: #2563eb;
+}
+
+.delete-button {
+    color: #ef4444;
+}
+
+.delete-button:hover {
+    color: #dc2626;
+}
+
+.loading-text {
+    text-align: center;
+    padding: 40px;
+    font-size: 18px;
+    color: #4b5563;
+}

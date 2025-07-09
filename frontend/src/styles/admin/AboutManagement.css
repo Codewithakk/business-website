@@ -1,0 +1,53 @@
+.about-management-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    padding-top: 40px;
+}
+
+.about-management-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.about-management-header h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1f2937;
+}
+
+.save-button {
+    background-color: #3b82f6;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.save-button:hover {
+    background-color: #2563eb;
+}
+
+.editor-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.quill-editor {
+    height: 500px;
+    margin-bottom: 40px;
+}
+
+.loading-text {
+    text-align: center;
+    padding: 40px;
+    font-size: 18px;
+    color: #4b5563;
+}
