@@ -28,7 +28,6 @@ This project is a **professional business website** with a secure **Admin Panel*
 - **Backend:** Node.js, Express, MongoDB Atlas
 - **Auth:** JWT (2 min Access Token, 2 day Refresh Token)
 - **Security:** Helmet.js, CORS, express-validator, express-mongo-sanitize, xss-clean, rate limiting
-- **Deployment:** Vercel (Frontend) + Render/Heroku (Backend)
 
 ---
 
@@ -133,3 +132,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
+for Admin panel 
+
+http://localhost:3000/admin/login
