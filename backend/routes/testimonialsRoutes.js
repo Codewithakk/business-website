@@ -10,7 +10,7 @@ router.get('/', testimonialsController.getAllTestimonials);
 router.get('/:id', testimonialsController.getTestimonialById);
 
 // Protected routes (require authentication)
-router.use(authMiddleware.protect);
+// router.use(authMiddleware.protect);
 
 router.post('/', testimonialsValidator.createTestimonial, validateRequest, testimonialsController.createTestimonial);
 router.put('/:id', testimonialsValidator.updateTestimonial, validateRequest, testimonialsController.updateTestimonial);

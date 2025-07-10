@@ -10,6 +10,14 @@ const sliderSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
+    title: {
+        type: String,
+        trim: true,
+    },
+    subtitle: {
+        type: String,
+        trim: true,
+    },
     order: {
         type: Number,
         default: 0,

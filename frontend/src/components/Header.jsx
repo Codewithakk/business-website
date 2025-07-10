@@ -1,10 +1,12 @@
-import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { FaBars, FaTimes } from 'react-icons/fa'
 import logo from '../assets/aayan-logo.png'
 
 export default function Header() {
     const [isOpen, setIsOpen] = useState(false)
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const navigate = useNavigate()
 
     const navLinks = [
         { name: 'Home', path: '/' },
@@ -12,8 +14,39 @@ export default function Header() {
         { name: 'Services', path: '#services' },
         { name: 'Testimonials', path: '#testimonials' },
         { name: 'Contact', path: '#contact' },
-        { name: 'Admin', path: '/admin/login' },
     ]
+
+    // Check token on mount
+    useEffect(() => {
+        const token = localStorage.getItem('accessToken')
+        if (token) {
+            setIsLoggedIn(true)
+        } else {
+            setIsLoggedIn(false)
+        }
+    }, [])
+
+    const handleLogout = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+
+            if (response.ok) {
+                localStorage.removeItem('accessToken')
+                setIsLoggedIn(false)
+                navigate('/') // redirect to home if needed
+            } else {
+                console.error('Logout failed')
+            }
+        } catch (error) {
+            console.error('Error logging out:', error)
+        }
+    }
 
     const styles = {
         header: {
@@ -43,6 +76,7 @@ export default function Header() {
             textDecoration: 'none',
             marginLeft: '24px',
             fontWeight: 500,
+            cursor: 'pointer',
         },
         navToggle: {
             background: 'none',
@@ -68,14 +102,14 @@ export default function Header() {
             textDecoration: 'none',
             padding: '8px 0',
             fontWeight: 500,
+            cursor: 'pointer',
         },
-        // Media query handled inline using JS:
         mdNavDesktop: {
             display: 'flex',
+            alignItems: 'center',
         },
     }
 
-    // Use window.innerWidth or a hook to handle responsive toggle for demo
     const isDesktop = window.innerWidth >= 768
 
     return (
@@ -106,6 +140,14 @@ export default function Header() {
                                     {link.name}
                                 </Link>
                             )
+                        )}
+                        {isLoggedIn && (
+                            <span
+                                style={styles.navLink}
+                                onClick={handleLogout}
+                            >
+                                Logout
+                            </span>
                         )}
                     </nav>
                 )}
@@ -145,6 +187,17 @@ export default function Header() {
                                         {link.name}
                                     </Link>
                                 )
+                            )}
+                            {isLoggedIn && (
+                                <span
+                                    style={styles.navMobileLink}
+                                    onClick={() => {
+                                        handleLogout()
+                                        setIsOpen(false)
+                                    }}
+                                >
+                                    Logout
+                                </span>
                             )}
                         </nav>
                     </div>

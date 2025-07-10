@@ -32,9 +32,13 @@ exports.createTestimonial = async (req, res, next) => {
     }
 
     try {
-        const { name, message, isActive } = req.body;
+        const { name, email, position, rating, message, isActive } = req.body;
+
         const newTestimonial = new Testimonial({
             name,
+            email,
+            position,
+            rating,
             message,
             isActive,
         });
@@ -47,6 +51,7 @@ exports.createTestimonial = async (req, res, next) => {
     }
 };
 
+
 exports.updateTestimonial = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -54,10 +59,11 @@ exports.updateTestimonial = async (req, res, next) => {
     }
 
     try {
-        const { name, message, isActive } = req.body;
+        const { name, email, position, rating, message, isActive } = req.body;
+
         const updatedTestimonial = await Testimonial.findByIdAndUpdate(
             req.params.id,
-            { name, message, isActive },
+            { name, email, position, rating, message, isActive },
             { new: true }
         );
 
@@ -71,6 +77,7 @@ exports.updateTestimonial = async (req, res, next) => {
         next(err);
     }
 };
+
 
 exports.deleteTestimonial = async (req, res, next) => {
     try {

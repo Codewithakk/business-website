@@ -1,23 +1,44 @@
-import { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { fetchContactSubmissions, deleteContactSubmission } from '../redux/contactSlice';
 import { FaTrash, FaEnvelope, FaUser, FaCalendar } from 'react-icons/fa';
 import { format } from 'date-fns';
 import '../styles/admin/ContactEntries.css';
 
 export default function ContactEntries() {
-    const dispatch = useDispatch();
-    const { submissions, loading } = useSelector((state) => state.contact);
+    const [submissions, setSubmissions] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        dispatch(fetchContactSubmissions());
-    }, [dispatch]);
+        fetchSubmissions();
+    }, []);
+
+    const fetchSubmissions = async () => {
+        try {
+            const response = await fetch('http://localhost:3000/api/contact');
+            if (!response.ok) {
+                throw new Error('Failed to fetch submissions');
+            }
+            const data = await response.json();
+            setSubmissions(data);
+        } catch (error) {
+            toast.error(error.message || 'Failed to load submissions');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this submission?')) {
             try {
-                await dispatch(deleteContactSubmission(id)).unwrap();
+                const response = await fetch(`http://localhost:3000/api/contact/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete submission');
+                }
+
+                setSubmissions(submissions.filter(submission => submission._id !== id));
                 toast.success('Submission deleted successfully');
             } catch (error) {
                 toast.error(error.message || 'Delete failed');

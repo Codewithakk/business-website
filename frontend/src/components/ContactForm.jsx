@@ -2,7 +2,6 @@ import '../styles/ContactForm.css';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useState } from 'react';
-import ReCAPTCHA from 'react-google-recaptcha';
 
 const contactSchema = Yup.object().shape({
     name: Yup.string()
@@ -17,19 +16,32 @@ const contactSchema = Yup.object().shape({
 });
 
 export default function ContactForm() {
-    const [recaptchaToken, setRecaptchaToken] = useState(null);
+    const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', null
 
     const handleSubmit = async (values, { setSubmitting, resetForm }) => {
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            alert('Message sent successfully!');
+            const response = await fetch('http://localhost:3000/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(values)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to send message');
+            }
+
+            setSubmitStatus('success');
             resetForm();
-            setRecaptchaToken(null);
         } catch (error) {
-            alert('Failed to send message');
+            console.error('Submission error:', error);
+            setSubmitStatus('error');
         } finally {
             setSubmitting(false);
+            // Auto-hide status messages after 5 seconds
+            setTimeout(() => setSubmitStatus(null), 5000);
         }
     };
 
@@ -41,6 +53,17 @@ export default function ContactForm() {
                 </div>
 
                 <div className="contact-form-container">
+                    {submitStatus === 'success' && (
+                        <div className="alert alert-success">
+                            Message sent successfully! We'll get back to you soon.
+                        </div>
+                    )}
+                    {submitStatus === 'error' && (
+                        <div className="alert alert-error">
+                            Failed to send message. Please try again later.
+                        </div>
+                    )}
+
                     <Formik
                         initialValues={{ name: '', email: '', message: '' }}
                         validationSchema={contactSchema}
@@ -88,14 +111,9 @@ export default function ContactForm() {
                                     <ErrorMessage name="message" component="div" className="error-message" />
                                 </div>
 
-                                <ReCAPTCHA
-                                    sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // Test key
-                                    onChange={(token) => setRecaptchaToken(token)}
-                                />
-
                                 <button
                                     type="submit"
-                                    disabled={isSubmitting || !recaptchaToken}
+                                    disabled={isSubmitting}
                                     className="submit-button"
                                 >
                                     {isSubmitting ? 'Sending...' : 'Send Message'}

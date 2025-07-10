@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import authService from '../services/authService'
+import { toast } from 'react-toastify'
 
 export const login = createAsyncThunk(
     'auth/login',
@@ -7,7 +8,8 @@ export const login = createAsyncThunk(
         try {
             const response = await authService.login(email, password)
             return response.data
-        } catch (error) {
+        }
+        catch (error) {
             const message =
                 error?.response?.data?.message ||
                 error?.message ||

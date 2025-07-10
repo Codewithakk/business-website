@@ -14,6 +14,10 @@ const serviceSchema = new mongoose.Schema({
         type: String,
         trim: true,
     },
+    serviceLink: {
+        type: String,
+        trim: true,
+    },
     isActive: {
         type: Boolean,
         default: true,

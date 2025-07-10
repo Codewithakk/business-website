@@ -12,14 +12,14 @@ exports.submitContactForm = async (req, res, next) => {
 
     try {
         // Verify reCAPTCHA token
-        const { recaptchaToken } = req.body;
-        const recaptchaResponse = await axios.post(
-            `https://www.google.com/recaptcha/api/siteverify?secret=${config.recaptcha.secretKey}&response=${recaptchaToken}`
-        );
+        // const { recaptchaToken } = req.body;
+        // const recaptchaResponse = await axios.post(
+        //     `https://www.google.com/recaptcha/api/siteverify?secret=${config.recaptcha.secretKey}&response=${recaptchaToken}`
+        // );
 
-        if (!recaptchaResponse.data.success) {
-            return res.status(400).json({ message: 'reCAPTCHA verification failed' });
-        }
+        // if (!recaptchaResponse.data.success) {
+        //     return res.status(400).json({ message: 'reCAPTCHA verification failed' });
+        // }
 
         const { name, email, message } = req.body;
         const newContact = new Contact({

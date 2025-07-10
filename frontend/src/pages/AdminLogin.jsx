@@ -1,19 +1,47 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { useDispatch } from 'react-redux';
-import { login } from '../redux/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import '../styles/admin/AdminLogin.css';
 
 const loginSchema = Yup.object().shape({
-    email: Yup.string().email('Invalid email').required('Required'),
-    password: Yup.string().required('Required').min(8, 'Too short'),
+    email: Yup.string().email('Invalid email').required('Email is required'),
+    password: Yup.string().required('Password is required').min(8, 'Password must be at least 8 characters'),
 });
 
+const API_URL = 'http://localhost:3000/api/auth/login';
+
 export default function AdminLogin() {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const handleLogin = async (values, { setSubmitting }) => {
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                credentials: 'include', // Important for cookies
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(values),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Login failed');
+            }
+
+            // Store the access token in localStorage
+            localStorage.setItem('accessToken', data.accessToken);
+
+            toast.success('Login successful');
+            navigate('/admin/dashboard');
+        } catch (error) {
+            toast.error(error.message || 'Login failed');
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
     return (
         <div className="login-container">
@@ -26,17 +54,7 @@ export default function AdminLogin() {
                 <Formik
                     initialValues={{ email: '', password: '' }}
                     validationSchema={loginSchema}
-                    onSubmit={async (values, { setSubmitting }) => {
-                        try {
-                            await dispatch(login(values)).unwrap();
-                            toast.success('Login successful');
-                            navigate('/admin/dashboard');
-                        } catch (error) {
-                            toast.error(error.message || 'Login failed');
-                        } finally {
-                            setSubmitting(false);
-                        }
-                    }}
+                    onSubmit={handleLogin}
                 >
                     {({ isSubmitting }) => (
                         <Form className="form">
@@ -46,6 +64,7 @@ export default function AdminLogin() {
                                     name="email"
                                     type="email"
                                     className="form-input"
+                                    placeholder="Enter your email"
                                 />
                                 <ErrorMessage name="email" component="div" className="error-message" />
                             </div>
@@ -56,6 +75,7 @@ export default function AdminLogin() {
                                     name="password"
                                     type="password"
                                     className="form-input"
+                                    placeholder="Enter your password"
                                 />
                                 <ErrorMessage name="password" component="div" className="error-message" />
                             </div>
@@ -63,9 +83,16 @@ export default function AdminLogin() {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="submit-button"
+                                className={`submit-button ${isSubmitting ? 'submitting' : ''}`}
                             >
-                                {isSubmitting ? 'Logging in...' : 'Login'}
+                                {isSubmitting ? (
+                                    <>
+                                        <span className="spinner"></span>
+                                        Logging in...
+                                    </>
+                                ) : (
+                                    'Login'
+                                )}
                             </button>
                         </Form>
                     )}

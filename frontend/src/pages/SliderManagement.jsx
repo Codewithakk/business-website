@@ -1,39 +1,64 @@
 import { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { FaPlus, FaEdit, FaTrash, FaToggleOn, FaToggleOff } from 'react-icons/fa';
-import {
-    fetchSlides,
-    createSlide,
-    updateSlide,
-    deleteSlide,
-    toggleSlideStatus
-} from '../redux/sliderSlice';
 import Modal from '../components/UI/Modal';
 import SlideForm from '../components/forms/SlideForm';
 import '../styles/admin/SliderManagement.css';
 
+const API_URL = 'http://localhost:3000/api/slider';
+
 export default function SliderManagement() {
-    const dispatch = useDispatch();
-    const { slides, loading } = useSelector((state) => state.slider);
+    const [slides, setSlides] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(null);
 
     useEffect(() => {
-        dispatch(fetchSlides());
-    }, [dispatch]);
+        fetchSlides();
+    }, []);
+
+    const fetchSlides = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) throw new Error('Failed to fetch slides');
+            const data = await response.json();
+            setSlides(data);
+        } catch (error) {
+            toast.error(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSubmit = async (slideData) => {
         try {
             if (currentSlide) {
-                await dispatch(updateSlide({ id: currentSlide._id, ...slideData })).unwrap();
+                // Update existing slide
+                const response = await fetch(`${API_URL}/${currentSlide._id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(slideData),
+                });
+                if (!response.ok) throw new Error('Failed to update slide');
                 toast.success('Slide updated successfully');
             } else {
-                await dispatch(createSlide(slideData)).unwrap();
+                // Create new slide
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(slideData),
+                });
+                if (!response.ok) throw new Error('Failed to create slide');
                 toast.success('Slide created successfully');
             }
             setIsModalOpen(false);
             setCurrentSlide(null);
+            fetchSlides(); // Refresh the list
         } catch (error) {
             toast.error(error.message || 'Operation failed');
         }
@@ -42,8 +67,12 @@ export default function SliderManagement() {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this slide?')) {
             try {
-                await dispatch(deleteSlide(id)).unwrap();
+                const response = await fetch(`${API_URL}/${id}`, {
+                    method: 'DELETE',
+                });
+                if (!response.ok) throw new Error('Failed to delete slide');
                 toast.success('Slide deleted successfully');
+                fetchSlides(); // Refresh the list
             } catch (error) {
                 toast.error(error.message || 'Delete failed');
             }
@@ -52,8 +81,16 @@ export default function SliderManagement() {
 
     const handleToggleStatus = async (id, isActive) => {
         try {
-            await dispatch(toggleSlideStatus({ id, isActive: !isActive })).unwrap();
+            const response = await fetch(`${API_URL}/${id}/status`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ isActive: !isActive }),
+            });
+            if (!response.ok) throw new Error('Failed to update slide status');
             toast.success('Slide status updated');
+            fetchSlides(); // Refresh the list
         } catch (error) {
             toast.error(error.message || 'Status update failed');
         }

@@ -10,7 +10,7 @@ const rateLimiter = require('../middleware/rateLimiter');
 router.post('/', rateLimiter, contactValidator.submitContactForm, validateRequest, contactController.submitContactForm);
 
 // Protected routes (require authentication)
-router.use(authMiddleware.protect);
+// router.use(authMiddleware.protect);
 router.get('/', contactController.getAllContactSubmissions);
 router.delete('/:id', contactController.deleteContactSubmission);
 

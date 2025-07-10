@@ -5,13 +5,103 @@ const serviceSchema = Yup.object().shape({
     title: Yup.string().required('Required').max(100, 'Too long'),
     imageUrl: Yup.string().url('Invalid URL').required('Required'),
     description: Yup.string().max(500, 'Too long'),
-    isActive: Yup.boolean().required('Required')
+    isActive: Yup.boolean().required('Required'),
 })
+
+const styles = {
+    container: {
+        backgroundColor: '#ffffff',
+        maxWidth: '500px',
+        margin: '0 auto',
+        padding: '2rem',
+        borderRadius: '8px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+        fontFamily: 'sans-serif',
+    },
+    title: {
+        fontSize: '1.5rem',
+        fontWeight: 600,
+        color: '#111827',
+        marginBottom: '1.5rem',
+    },
+    label: {
+        display: 'block',
+        fontSize: '0.875rem',
+        fontWeight: 500,
+        color: '#374151',
+        marginBottom: '0.25rem',
+    },
+    input: {
+        width: '100%',
+        padding: '0.5rem 0.75rem',
+        border: '1px solid #D1D5DB',
+        borderRadius: '6px',
+        boxSizing: 'border-box',
+        fontSize: '1rem',
+        outline: 'none',
+        transition: 'border 0.2s, box-shadow 0.2s',
+    },
+    inputFocus: {
+        border: '1px solid #3B82F6',
+        boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.5)',
+    },
+    textarea: {
+        width: '100%',
+        padding: '0.5rem 0.75rem',
+        border: '1px solid #D1D5DB',
+        borderRadius: '6px',
+        boxSizing: 'border-box',
+        fontSize: '1rem',
+        resize: 'vertical',
+        outline: 'none',
+    },
+    error: {
+        marginTop: '0.25rem',
+        fontSize: '0.875rem',
+        color: '#DC2626',
+    },
+    checkboxContainer: {
+        display: 'flex',
+        alignItems: 'center',
+        marginBottom: '1.5rem',
+    },
+    checkbox: {
+        width: '16px',
+        height: '16px',
+        marginRight: '0.5rem',
+    },
+    actions: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        gap: '0.5rem',
+        marginTop: '1rem',
+    },
+    button: {
+        padding: '0.5rem 1rem',
+        fontSize: '1rem',
+        borderRadius: '6px',
+        border: 'none',
+        cursor: 'pointer',
+        transition: 'background 0.2s',
+    },
+    saveButton: {
+        backgroundColor: '#3B82F6',
+        color: '#ffffff',
+    },
+    saveButtonHover: {
+        backgroundColor: '#2563EB',
+    },
+    cancelButton: {
+        backgroundColor: '#F9FAFB',
+        color: '#374151',
+        border: '1px solid #D1D5DB',
+    },
+}
 
 export default function ServiceForm({ initialValues, onSubmit, onCancel }) {
     return (
-        <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <div style={styles.container}>
+            <h3 style={styles.title}>
                 {initialValues._id ? 'Edit Service' : 'Add New Service'}
             </h3>
 
@@ -20,68 +110,100 @@ export default function ServiceForm({ initialValues, onSubmit, onCancel }) {
                 validationSchema={serviceSchema}
                 onSubmit={onSubmit}
             >
-                {({ isSubmitting }) => (
+                {({ isSubmitting, setFieldValue, values }) => (
                     <Form>
-                        <div className="mb-4">
-                            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label htmlFor="title" style={styles.label}>
                                 Title
                             </label>
-                            <Field
-                                name="title"
-                                type="text"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            />
-                            <ErrorMessage name="title" component="div" className="mt-1 text-sm text-red-600" />
+                            <Field name="title">
+                                {({ field }) => (
+                                    <input
+                                        {...field}
+                                        type="text"
+                                        placeholder="Service title"
+                                        style={styles.input}
+                                    />
+                                )}
+                            </Field>
+                            <ErrorMessage name="title" component="div" style={styles.error} />
                         </div>
 
-                        <div className="mb-4">
-                            <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-1">
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label htmlFor="imageUrl" style={styles.label}>
                                 Image URL
                             </label>
-                            <Field
+                            <Field name="imageUrl">
+                                {({ field }) => (
+                                    <input
+                                        {...field}
+                                        type="url"
+                                        placeholder="https://example.com/image.jpg"
+                                        style={styles.input}
+                                    />
+                                )}
+                            </Field>
+                            <ErrorMessage
                                 name="imageUrl"
-                                type="url"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                component="div"
+                                style={styles.error}
                             />
-                            <ErrorMessage name="imageUrl" component="div" className="mt-1 text-sm text-red-600" />
                         </div>
 
-                        <div className="mb-4">
-                            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label htmlFor="description" style={styles.label}>
                                 Description
                             </label>
-                            <Field
+                            <Field name="description">
+                                {({ field }) => (
+                                    <textarea
+                                        {...field}
+                                        rows="3"
+                                        placeholder="Describe your service"
+                                        style={styles.textarea}
+                                    />
+                                )}
+                            </Field>
+                            <ErrorMessage
                                 name="description"
-                                as="textarea"
-                                rows="3"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                component="div"
+                                style={styles.error}
                             />
-                            <ErrorMessage name="description" component="div" className="mt-1 text-sm text-red-600" />
                         </div>
 
-                        <div className="mb-4 flex items-center">
-                            <Field
-                                name="isActive"
-                                type="checkbox"
-                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            />
-                            <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
+                        <div style={styles.checkboxContainer}>
+                            <Field name="isActive">
+                                {({ field }) => (
+                                    <input
+                                        {...field}
+                                        type="checkbox"
+                                        checked={values.isActive}
+                                        style={styles.checkbox}
+                                        onChange={() => setFieldValue('isActive', !values.isActive)}
+                                    />
+                                )}
+                            </Field>
+                            <label htmlFor="isActive" style={{ fontSize: '0.9rem' }}>
                                 Active
                             </label>
                         </div>
 
-                        <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <div style={styles.actions}>
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:bg-blue-400"
+                                style={{
+                                    ...styles.button,
+                                    ...styles.saveButton,
+                                    ...(isSubmitting ? { opacity: 0.7, cursor: 'not-allowed' } : {}),
+                                }}
                             >
                                 {isSubmitting ? 'Saving...' : 'Save'}
                             </button>
                             <button
                                 type="button"
                                 onClick={onCancel}
-                                className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                style={{ ...styles.button, ...styles.cancelButton }}
                             >
                                 Cancel
                             </button>

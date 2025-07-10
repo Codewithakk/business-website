@@ -24,7 +24,6 @@ exports.getSlideById = async (req, res, next) => {
         next(err);
     }
 };
-
 exports.createSlide = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -32,10 +31,13 @@ exports.createSlide = async (req, res, next) => {
     }
 
     try {
-        const { imageUrl, altText, order, isActive } = req.body;
+        const { imageUrl, altText, title, subtitle, order, isActive } = req.body; // <-- FIXED
+
         const newSlide = new Slider({
             imageUrl,
             altText,
+            title,
+            subtitle,
             order,
             isActive,
         });
@@ -48,6 +50,7 @@ exports.createSlide = async (req, res, next) => {
     }
 };
 
+
 exports.updateSlide = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -55,10 +58,11 @@ exports.updateSlide = async (req, res, next) => {
     }
 
     try {
-        const { imageUrl, altText, order, isActive } = req.body;
+        const { imageUrl, altText, title, subtitle, order, isActive } = req.body; // <-- FIXED
+
         const updatedSlide = await Slider.findByIdAndUpdate(
             req.params.id,
-            { imageUrl, altText, order, isActive },
+            { imageUrl, altText, title, subtitle, order, isActive },
             { new: true }
         );
 
@@ -72,6 +76,7 @@ exports.updateSlide = async (req, res, next) => {
         next(err);
     }
 };
+
 
 exports.deleteSlide = async (req, res, next) => {
     try {

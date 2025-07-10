@@ -3,19 +3,98 @@ import * as Yup from 'yup'
 
 const testimonialSchema = Yup.object().shape({
     name: Yup.string()
-        .required('Required')
+        .required('Name is required')
         .matches(/^[A-Za-z\s]+$/, 'Name can only contain letters and spaces'),
+    email: Yup.string().required('Email is required').email('Must be a valid email'),
+    position: Yup.string().max(100, 'Position must be under 100 characters'),
+    rating: Yup.number().min(1, 'Minimum rating is 1').max(5, 'Maximum rating is 5'),
     message: Yup.string()
-        .required('Required')
-        .min(20, 'Must be at least 20 characters')
-        .max(500, 'Too long'),
-    isActive: Yup.boolean().required('Required')
+        .required('Message is required')
+        .min(20, 'Message must be at least 20 characters')
+        .max(500, 'Message is too long'),
+    isActive: Yup.boolean().required('Required'),
 })
+
+const styles = {
+    container: {
+        background: '#fff',
+        maxWidth: '500px',
+        margin: '0 auto',
+        padding: '2rem',
+        borderRadius: '8px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        fontFamily: 'sans-serif',
+    },
+    title: {
+        fontSize: '1.5rem',
+        fontWeight: 600,
+        color: '#111827',
+        marginBottom: '1.5rem',
+    },
+    label: {
+        display: 'block',
+        fontSize: '0.875rem',
+        fontWeight: 500,
+        color: '#374151',
+        marginBottom: '0.25rem',
+    },
+    input: {
+        width: '100%',
+        padding: '0.5rem 0.75rem',
+        border: '1px solid #D1D5DB',
+        borderRadius: '6px',
+        fontSize: '1rem',
+        marginBottom: '0.75rem',
+    },
+    textarea: {
+        width: '100%',
+        padding: '0.5rem 0.75rem',
+        border: '1px solid #D1D5DB',
+        borderRadius: '6px',
+        fontSize: '1rem',
+        resize: 'vertical',
+        marginBottom: '0.75rem',
+    },
+    error: {
+        fontSize: '0.875rem',
+        color: '#DC2626',
+        marginBottom: '1rem',
+    },
+    checkboxContainer: {
+        display: 'flex',
+        alignItems: 'center',
+        marginBottom: '1.5rem',
+    },
+    checkbox: {
+        marginRight: '0.5rem',
+    },
+    actions: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        gap: '0.5rem',
+    },
+    button: {
+        padding: '0.5rem 1rem',
+        fontSize: '1rem',
+        borderRadius: '6px',
+        border: 'none',
+        cursor: 'pointer',
+    },
+    saveButton: {
+        background: '#3B82F6',
+        color: '#fff',
+    },
+    cancelButton: {
+        background: '#fff',
+        color: '#374151',
+        border: '1px solid #D1D5DB',
+    },
+}
 
 export default function TestimonialForm({ initialValues, onSubmit, onCancel }) {
     return (
-        <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <div style={styles.container}>
+            <h3 style={styles.title}>
                 {initialValues._id ? 'Edit Testimonial' : 'Add New Testimonial'}
             </h3>
 
@@ -26,56 +105,69 @@ export default function TestimonialForm({ initialValues, onSubmit, onCancel }) {
             >
                 {({ isSubmitting }) => (
                     <Form>
-                        <div className="mb-4">
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                                Name
-                            </label>
-                            <Field
-                                name="name"
-                                type="text"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            />
-                            <ErrorMessage name="name" component="div" className="mt-1 text-sm text-red-600" />
+                        <label htmlFor="name" style={styles.label}>
+                            Name
+                        </label>
+                        <Field name="name">
+                            {({ field }) => <input {...field} type="text" style={styles.input} />}
+                        </Field>
+                        <ErrorMessage name="name" component="div" style={styles.error} />
+
+                        <label htmlFor="email" style={styles.label}>
+                            Email
+                        </label>
+                        <Field name="email">
+                            {({ field }) => <input {...field} type="email" style={styles.input} />}
+                        </Field>
+                        <ErrorMessage name="email" component="div" style={styles.error} />
+
+                        <label htmlFor="position" style={styles.label}>
+                            Position (optional)
+                        </label>
+                        <Field name="position">
+                            {({ field }) => <input {...field} type="text" style={styles.input} />}
+                        </Field>
+                        <ErrorMessage name="position" component="div" style={styles.error} />
+
+                        <label htmlFor="rating" style={styles.label}>
+                            Rating (1–5)
+                        </label>
+                        <Field name="rating">
+                            {({ field }) => <input {...field} type="number" min="1" max="5" style={styles.input} />}
+                        </Field>
+                        <ErrorMessage name="rating" component="div" style={styles.error} />
+
+                        <label htmlFor="message" style={styles.label}>
+                            Message
+                        </label>
+                        <Field name="message">
+                            {({ field }) => <textarea {...field} rows="4" style={styles.textarea} />}
+                        </Field>
+                        <ErrorMessage name="message" component="div" style={styles.error} />
+
+                        <div style={styles.checkboxContainer}>
+                            <Field name="isActive">
+                                {({ field }) => (
+                                    <input {...field} type="checkbox" style={styles.checkbox} />
+                                )}
+                            </Field>
+                            <label htmlFor="isActive">Active</label>
                         </div>
 
-                        <div className="mb-4">
-                            <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                                Message
-                            </label>
-                            <Field
-                                name="message"
-                                as="textarea"
-                                rows="4"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            />
-                            <ErrorMessage name="message" component="div" className="mt-1 text-sm text-red-600" />
-                        </div>
-
-                        <div className="mb-4 flex items-center">
-                            <Field
-                                name="isActive"
-                                type="checkbox"
-                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            />
-                            <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
-                                Active
-                            </label>
-                        </div>
-
-                        <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                            <button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:bg-blue-400"
-                            >
-                                {isSubmitting ? 'Saving...' : 'Save'}
-                            </button>
+                        <div style={styles.actions}>
                             <button
                                 type="button"
                                 onClick={onCancel}
-                                className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                style={{ ...styles.button, ...styles.cancelButton }}
                             >
                                 Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                style={{ ...styles.button, ...styles.saveButton }}
+                            >
+                                {isSubmitting ? 'Saving...' : 'Save'}
                             </button>
                         </div>
                     </Form>

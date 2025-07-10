@@ -1,37 +1,72 @@
 import { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import {
-    fetchTestimonials,
-    createTestimonial,
-    updateTestimonial,
-    deleteTestimonial,
-    toggleTestimonialStatus
-} from '../redux/testimonialsSlice';
 import Modal from '../components/UI/Modal';
 import TestimonialForm from '../components/forms/TestimonialForm';
-import { FaPlus, FaEdit, FaTrash, FaToggleOn, FaToggleOff } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaToggleOn, FaToggleOff, FaStar } from 'react-icons/fa';
 import '../styles/admin/TestimonialsManagement.css';
 
 export default function TestimonialsManagement() {
-    const dispatch = useDispatch();
-    const { testimonials, loading } = useSelector((state) => state.testimonials);
+    const [testimonials, setTestimonials] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentTestimonial, setCurrentTestimonial] = useState(null);
 
     useEffect(() => {
-        dispatch(fetchTestimonials());
-    }, [dispatch]);
+        fetchTestimonials();
+    }, []);
+
+    const fetchTestimonials = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch('http://localhost:3000/api/testimonials');
+            if (!response.ok) {
+                throw new Error('Failed to fetch testimonials');
+            }
+            const data = await response.json();
+            setTestimonials(data);
+        } catch (error) {
+            toast.error(error.message || 'Failed to load testimonials');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSubmit = async (testimonialData) => {
         try {
-            if (currentTestimonial) {
-                await dispatch(updateTestimonial({ id: currentTestimonial._id, ...testimonialData })).unwrap();
-                toast.success('Testimonial updated successfully');
-            } else {
-                await dispatch(createTestimonial(testimonialData)).unwrap();
-                toast.success('Testimonial created successfully');
+            // Validate rating
+            if (testimonialData.rating < 1 || testimonialData.rating > 5) {
+                throw new Error('Rating must be between 1 and 5');
             }
+
+            let response;
+            if (currentTestimonial) {
+                // Update existing testimonial
+                response = await fetch(`http://localhost:3000/api/testimonials/${currentTestimonial._id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testimonialData)
+                });
+            } else {
+                // Create new testimonial
+                response = await fetch('http://localhost:3000/api/testimonials', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testimonialData)
+                });
+            }
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Operation failed');
+            }
+
+            toast.success(`Testimonial ${currentTestimonial ? 'updated' : 'created'} successfully`);
+            fetchTestimonials();
             setIsModalOpen(false);
             setCurrentTestimonial(null);
         } catch (error) {
@@ -42,8 +77,16 @@ export default function TestimonialsManagement() {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this testimonial?')) {
             try {
-                await dispatch(deleteTestimonial(id)).unwrap();
+                const response = await fetch(`http://localhost:3000/api/testimonials/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Delete failed');
+                }
+
                 toast.success('Testimonial deleted successfully');
+                fetchTestimonials();
             } catch (error) {
                 toast.error(error.message || 'Delete failed');
             }
@@ -52,11 +95,36 @@ export default function TestimonialsManagement() {
 
     const handleToggleStatus = async (id, isActive) => {
         try {
-            await dispatch(toggleTestimonialStatus({ id, isActive: !isActive })).unwrap();
+            const response = await fetch(`http://localhost:3000/api/testimonials/${id}/status`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ isActive: !isActive })
+            });
+
+            if (!response.ok) {
+                throw new Error('Status update failed');
+            }
+
             toast.success('Testimonial status updated');
+            fetchTestimonials();
         } catch (error) {
             toast.error(error.message || 'Status update failed');
         }
+    };
+
+    const renderRatingStars = (rating) => {
+        return (
+            <div className="rating-stars">
+                {[...Array(5)].map((_, i) => (
+                    <FaStar
+                        key={i}
+                        className={i < rating ? 'star-filled' : 'star-empty'}
+                    />
+                ))}
+            </div>
+        );
     };
 
     return (
@@ -82,7 +150,10 @@ export default function TestimonialsManagement() {
                         <thead>
                             <tr>
                                 <th>Name</th>
+                                <th>Email</th>
+                                <th>Position</th>
                                 <th>Message</th>
+                                <th>Rating</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -91,32 +162,42 @@ export default function TestimonialsManagement() {
                             {testimonials.map((testimonial) => (
                                 <tr key={testimonial._id}>
                                     <td>{testimonial.name}</td>
-                                    <td className="message-cell">{testimonial.message}</td>
+                                    <td>{testimonial.email}</td>
+                                    <td>{testimonial.position}</td>
+                                    <td className="message-cell">
+                                        {testimonial.message.length > 50
+                                            ? `${testimonial.message.substring(0, 50)}...`
+                                            : testimonial.message}
+                                    </td>
+                                    <td>{renderRatingStars(testimonial.rating)}</td>
                                     <td>
                                         <button
                                             onClick={() => handleToggleStatus(testimonial._id, testimonial.isActive)}
-                                            className="toggle-button"
+                                            className={`status-button ${testimonial.isActive ? 'active' : 'inactive'}`}
+                                            title={testimonial.isActive ? 'Active' : 'Inactive'}
                                         >
                                             {testimonial.isActive ? (
-                                                <FaToggleOn className="toggle-on" />
+                                                <FaToggleOn className="toggle-icon active" />
                                             ) : (
-                                                <FaToggleOff className="toggle-off" />
+                                                <FaToggleOff className="toggle-icon inactive" />
                                             )}
                                         </button>
                                     </td>
-                                    <td>
+                                    <td className="actions-cell">
                                         <button
                                             onClick={() => {
                                                 setCurrentTestimonial(testimonial);
                                                 setIsModalOpen(true);
                                             }}
                                             className="edit-button"
+                                            title="Edit"
                                         >
                                             <FaEdit />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(testimonial._id)}
                                             className="delete-button"
+                                            title="Delete"
                                         >
                                             <FaTrash />
                                         </button>
@@ -130,7 +211,14 @@ export default function TestimonialsManagement() {
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 <TestimonialForm
-                    initialValues={currentTestimonial || { name: '', message: '', isActive: true }}
+                    initialValues={currentTestimonial || {
+                        name: '',
+                        email: '',
+                        position: '',
+                        rating: 5,
+                        message: '',
+                        isActive: true
+                    }}
                     onSubmit={handleSubmit}
                     onCancel={() => setIsModalOpen(false)}
                 />

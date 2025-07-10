@@ -1,61 +1,80 @@
-import { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { toast } from 'react-toastify';
-import {
-    fetchServices,
-    createService,
-    updateService,
-    deleteService,
-    toggleServiceStatus
-} from '../redux/servicesSlice';
 import Modal from '../components/UI/Modal';
 import ServiceForm from '../components/forms/ServiceForm';
 import { FaPlus, FaEdit, FaTrash, FaToggleOn, FaToggleOff } from 'react-icons/fa';
 import '../styles/admin/ServicesManagement.css';
 
+const API_URL = 'http://localhost:3000/api/services';
+
 export default function ServicesManagement() {
-    const dispatch = useDispatch();
-    const { services, loading } = useSelector((state) => state.services);
+    const [services, setServices] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentService, setCurrentService] = useState(null);
 
     useEffect(() => {
-        dispatch(fetchServices());
-    }, [dispatch]);
+        fetchServices();
+    }, []);
+
+    const fetchServices = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.get(API_URL);
+            setServices(response.data);
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to fetch services');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSubmit = async (serviceData) => {
         try {
             if (currentService) {
-                await dispatch(updateService({ id: currentService._id, ...serviceData })).unwrap();
+                // Update existing service
+                await axios.put(`${API_URL}/${currentService._id}`, serviceData);
                 toast.success('Service updated successfully');
             } else {
-                await dispatch(createService(serviceData)).unwrap();
+                // Create new service
+                await axios.post(API_URL, serviceData);
                 toast.success('Service created successfully');
             }
             setIsModalOpen(false);
             setCurrentService(null);
+            fetchServices(); // Refresh the list
         } catch (error) {
-            toast.error(error.message || 'Operation failed');
+            toast.error(error.response?.data?.message || 'Operation failed');
         }
     };
+    useEffect(() => {
+        if (isModalOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+    }, [isModalOpen]);
 
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this service?')) {
             try {
-                await dispatch(deleteService(id)).unwrap();
+                await axios.delete(`${API_URL}/${id}`);
                 toast.success('Service deleted successfully');
+                fetchServices(); // Refresh the list
             } catch (error) {
-                toast.error(error.message || 'Delete failed');
+                toast.error(error.response?.data?.message || 'Delete failed');
             }
         }
     };
 
     const handleToggleStatus = async (id, isActive) => {
         try {
-            await dispatch(toggleServiceStatus({ id, isActive: !isActive })).unwrap();
+            await axios.patch(`${API_URL}/${id}/status`, { isActive: !isActive });
             toast.success('Service status updated');
+            fetchServices(); // Refresh the list
         } catch (error) {
-            toast.error(error.message || 'Status update failed');
+            toast.error(error.response?.data?.message || 'Status update failed');
         }
     };
 
@@ -125,7 +144,13 @@ export default function ServicesManagement() {
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 <ServiceForm
-                    initialValues={currentService || { title: '', imageUrl: '', description: '', isActive: true }}
+                    initialValues={currentService || {
+                        title: '',
+                        imageUrl: '',
+                        description: '',
+                        serviceLink: '',
+                        isActive: true
+                    }}
                     onSubmit={handleSubmit}
                     onCancel={() => setIsModalOpen(false)}
                 />

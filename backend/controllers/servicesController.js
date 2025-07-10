@@ -32,11 +32,12 @@ exports.createService = async (req, res, next) => {
     }
 
     try {
-        const { title, imageUrl, description, isActive } = req.body;
+        const { title, imageUrl, description, serviceLink, isActive } = req.body;
         const newService = new Service({
             title,
             imageUrl,
             description,
+            serviceLink,
             isActive,
         });
 
@@ -55,10 +56,10 @@ exports.updateService = async (req, res, next) => {
     }
 
     try {
-        const { title, imageUrl, description, isActive } = req.body;
+        const { title, imageUrl, description, serviceLink, isActive } = req.body;
         const updatedService = await Service.findByIdAndUpdate(
             req.params.id,
-            { title, imageUrl, description, isActive },
+            { title, imageUrl, description, serviceLink, isActive },
             { new: true }
         );
 

@@ -1,12 +1,13 @@
-// ProtectedRoute.jsx
 import { Navigate, Outlet } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { selectCurrentToken } from '../redux/authSlice';
 
 const ProtectedRoute = () => {
-    const token = useSelector(selectCurrentToken);
+    // ✅ Read token directly from localStorage
+    const token = localStorage.getItem('token');
 
-    return token ? <Outlet /> : <Navigate to="/admin/login" replace />;
+    // ✅ You may also add validation logic here if you wish
+    const isValid = !!token; // Or decode + check expiry if using JWT
+
+    return isValid ? <Outlet /> : <Navigate to="/admin/login" replace />;
 };
 
 export default ProtectedRoute;
