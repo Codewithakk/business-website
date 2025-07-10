@@ -135,3 +135,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 for Admin panel 
 
 http://localhost:3000/admin/login
+
+    "email":"testuser@example.com",
+    "password":"SecurePass123"
