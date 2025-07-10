@@ -16,7 +16,7 @@ const contactSchema = Yup.object().shape({
 });
 
 export default function ContactForm() {
-    const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', null
+    const [submitStatus, setSubmitStatus] = useState(null);
 
     const handleSubmit = async (values, { setSubmitting, resetForm }) => {
         try {

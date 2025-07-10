@@ -5,7 +5,7 @@ export default function Footer() {
 
     const styles = {
         footer: {
-            backgroundColor: '#1f2937', // same as Tailwind's gray-800
+            backgroundColor: '#1f2937',
             color: '#fff',
             padding: '2rem 0',
         },
@@ -30,7 +30,7 @@ export default function Footer() {
             marginBottom: '1rem',
         },
         paragraph: {
-            color: '#d1d5db', // Tailwind's gray-300
+            color: '#d1d5db',
             lineHeight: '1.6',
         },
         list: {
@@ -57,15 +57,15 @@ export default function Footer() {
             textDecoration: 'none',
         },
         borderTop: {
-            borderTop: '1px solid #374151', // Tailwind's gray-700
+            borderTop: '1px solid #374151',
             marginTop: '2rem',
             paddingTop: '1.5rem',
             textAlign: 'center',
-            color: '#ef4444', // Tailwind's red-500
+            color: '#ef4444',
         },
     }
 
-    // Optional: detect screen width for grid
+
     const isMd = window.innerWidth >= 768
 
     return (

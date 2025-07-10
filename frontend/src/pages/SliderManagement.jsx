@@ -19,8 +19,13 @@ export default function SliderManagement() {
 
     const fetchSlides = async () => {
         setLoading(true);
+        const accessToken = localStorage.getItem('accessToken');
         try {
-            const response = await fetch(API_URL);
+            const response = await fetch(API_URL, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+            });
             if (!response.ok) throw new Error('Failed to fetch slides');
             const data = await response.json();
             setSlides(data);
@@ -32,24 +37,25 @@ export default function SliderManagement() {
     };
 
     const handleSubmit = async (slideData) => {
+        const accessToken = localStorage.getItem('accessToken');
         try {
             if (currentSlide) {
-                // Update existing slide
                 const response = await fetch(`${API_URL}/${currentSlide._id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`,
                     },
                     body: JSON.stringify(slideData),
                 });
                 if (!response.ok) throw new Error('Failed to update slide');
                 toast.success('Slide updated successfully');
             } else {
-                // Create new slide
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`,
                     },
                     body: JSON.stringify(slideData),
                 });
@@ -58,21 +64,25 @@ export default function SliderManagement() {
             }
             setIsModalOpen(false);
             setCurrentSlide(null);
-            fetchSlides(); // Refresh the list
+            fetchSlides();
         } catch (error) {
             toast.error(error.message || 'Operation failed');
         }
     };
 
     const handleDelete = async (id) => {
+        const accessToken = localStorage.getItem('accessToken');
         if (window.confirm('Are you sure you want to delete this slide?')) {
             try {
                 const response = await fetch(`${API_URL}/${id}`, {
                     method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                    },
                 });
                 if (!response.ok) throw new Error('Failed to delete slide');
                 toast.success('Slide deleted successfully');
-                fetchSlides(); // Refresh the list
+                fetchSlides();
             } catch (error) {
                 toast.error(error.message || 'Delete failed');
             }
@@ -80,17 +90,19 @@ export default function SliderManagement() {
     };
 
     const handleToggleStatus = async (id, isActive) => {
+        const accessToken = localStorage.getItem('accessToken');
         try {
             const response = await fetch(`${API_URL}/${id}/status`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
                 },
                 body: JSON.stringify({ isActive: !isActive }),
             });
             if (!response.ok) throw new Error('Failed to update slide status');
             toast.success('Slide status updated');
-            fetchSlides(); // Refresh the list
+            fetchSlides();
         } catch (error) {
             toast.error(error.message || 'Status update failed');
         }

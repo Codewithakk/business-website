@@ -2,12 +2,14 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { FaBars, FaTimes } from 'react-icons/fa'
 import logo from '../assets/aayan-logo.png'
+import { useLocation } from 'react-router-dom';
 
 export default function Header() {
     const [isOpen, setIsOpen] = useState(false)
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const navigate = useNavigate()
 
+    const location = useLocation();
     const navLinks = [
         { name: 'Home', path: '/' },
         { name: 'About', path: '#about' },
@@ -15,7 +17,10 @@ export default function Header() {
         { name: 'Testimonials', path: '#testimonials' },
         { name: 'Contact', path: '#contact' },
     ]
-
+    useEffect(() => {
+        const token = localStorage.getItem('accessToken');
+        setIsLoggedIn(!!token);
+    }, [location]);
     // Check token on mount
     useEffect(() => {
         const token = localStorage.getItem('accessToken')

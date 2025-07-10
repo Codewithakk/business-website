@@ -19,9 +19,14 @@ export default function ServicesManagement() {
     }, []);
 
     const fetchServices = async () => {
+        const accessToken = localStorage.getItem('accessToken');
         try {
             setLoading(true);
-            const response = await axios.get(API_URL);
+            const response = await axios.get(API_URL, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
             setServices(response.data);
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to fetch services');
@@ -31,14 +36,21 @@ export default function ServicesManagement() {
     };
 
     const handleSubmit = async (serviceData) => {
+        const accessToken = localStorage.getItem('accessToken');
         try {
             if (currentService) {
-                // Update existing service
-                await axios.put(`${API_URL}/${currentService._id}`, serviceData);
+                await axios.put(`${API_URL}/${currentService._id}`, serviceData, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
                 toast.success('Service updated successfully');
             } else {
-                // Create new service
-                await axios.post(API_URL, serviceData);
+                await axios.post(API_URL, serviceData, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
                 toast.success('Service created successfully');
             }
             setIsModalOpen(false);
@@ -48,6 +60,7 @@ export default function ServicesManagement() {
             toast.error(error.response?.data?.message || 'Operation failed');
         }
     };
+
     useEffect(() => {
         if (isModalOpen) {
             document.body.style.overflow = 'hidden';
@@ -57,9 +70,14 @@ export default function ServicesManagement() {
     }, [isModalOpen]);
 
     const handleDelete = async (id) => {
+        const accessToken = localStorage.getItem('accessToken');
         if (window.confirm('Are you sure you want to delete this service?')) {
             try {
-                await axios.delete(`${API_URL}/${id}`);
+                await axios.delete(`${API_URL}/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
                 toast.success('Service deleted successfully');
                 fetchServices(); // Refresh the list
             } catch (error) {
@@ -69,8 +87,17 @@ export default function ServicesManagement() {
     };
 
     const handleToggleStatus = async (id, isActive) => {
+        const accessToken = localStorage.getItem('accessToken');
         try {
-            await axios.patch(`${API_URL}/${id}/status`, { isActive: !isActive });
+            await axios.patch(
+                `${API_URL}/${id}/status`,
+                { isActive: !isActive },
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                }
+            );
             toast.success('Service status updated');
             fetchServices(); // Refresh the list
         } catch (error) {
@@ -144,13 +171,15 @@ export default function ServicesManagement() {
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 <ServiceForm
-                    initialValues={currentService || {
-                        title: '',
-                        imageUrl: '',
-                        description: '',
-                        serviceLink: '',
-                        isActive: true
-                    }}
+                    initialValues={
+                        currentService || {
+                            title: '',
+                            imageUrl: '',
+                            description: '',
+                            serviceLink: '',
+                            isActive: true,
+                        }
+                    }
                     onSubmit={handleSubmit}
                     onCancel={() => setIsModalOpen(false)}
                 />

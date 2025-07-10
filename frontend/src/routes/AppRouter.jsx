@@ -15,8 +15,8 @@ function AppRouter() {
         <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/admin/login" element={<AdminLogin />} />
-            <Route>
-                {/* <Route element={<ProtectedRoute />}> */}
+            {/* <Route> */}
+            <Route element={<ProtectedRoute />}>
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/slider" element={<SliderManagement />} />
                 <Route path="/admin/about" element={<AboutManagement />} />

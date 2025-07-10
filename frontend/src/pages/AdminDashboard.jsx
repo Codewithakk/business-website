@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { FaImages, FaInfoCircle, FaTools, FaComments, FaEnvelope } from 'react-icons/fa';
-import '../styles/admin/AdminDashboard.css'; // Import your CSS styles
+import '../styles/admin/AdminDashboard.css';
 
 export default function AdminDashboard() {
     const { user } = useSelector((state) => state.auth);

@@ -18,7 +18,7 @@ export default function AdminLogin() {
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
-                credentials: 'include', // Important for cookies
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                 },

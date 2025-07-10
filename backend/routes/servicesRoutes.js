@@ -10,7 +10,7 @@ router.get('/', servicesController.getAllServices);
 router.get('/:id', servicesController.getServiceById);
 
 // Protected routes (require authentication)
-// router.use(authMiddleware.protect);
+router.use(authMiddleware.protect);
 
 router.post('/', servicesValidator.createService, validateRequest, servicesController.createService);
 router.put('/:id', servicesValidator.updateService, validateRequest, servicesController.updateService);

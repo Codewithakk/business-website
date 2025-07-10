@@ -17,8 +17,13 @@ export default function TestimonialsManagement() {
 
     const fetchTestimonials = async () => {
         setLoading(true);
+        const accessToken = localStorage.getItem('accessToken');
         try {
-            const response = await fetch('http://localhost:3000/api/testimonials');
+            const response = await fetch('http://localhost:3000/api/testimonials', {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
             if (!response.ok) {
                 throw new Error('Failed to fetch testimonials');
             }
@@ -32,8 +37,8 @@ export default function TestimonialsManagement() {
     };
 
     const handleSubmit = async (testimonialData) => {
+        const accessToken = localStorage.getItem('accessToken');
         try {
-            // Validate rating
             if (testimonialData.rating < 1 || testimonialData.rating > 5) {
                 throw new Error('Rating must be between 1 and 5');
             }
@@ -45,8 +50,9 @@ export default function TestimonialsManagement() {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${accessToken}`,
                     },
-                    body: JSON.stringify(testimonialData)
+                    body: JSON.stringify(testimonialData),
                 });
             } else {
                 // Create new testimonial
@@ -54,8 +60,9 @@ export default function TestimonialsManagement() {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${accessToken}`,
                     },
-                    body: JSON.stringify(testimonialData)
+                    body: JSON.stringify(testimonialData),
                 });
             }
 
@@ -75,10 +82,14 @@ export default function TestimonialsManagement() {
     };
 
     const handleDelete = async (id) => {
+        const accessToken = localStorage.getItem('accessToken');
         if (window.confirm('Are you sure you want to delete this testimonial?')) {
             try {
                 const response = await fetch(`http://localhost:3000/api/testimonials/${id}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
                 });
 
                 if (!response.ok) {
@@ -94,13 +105,15 @@ export default function TestimonialsManagement() {
     };
 
     const handleToggleStatus = async (id, isActive) => {
+        const accessToken = localStorage.getItem('accessToken');
         try {
             const response = await fetch(`http://localhost:3000/api/testimonials/${id}/status`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
                 },
-                body: JSON.stringify({ isActive: !isActive })
+                body: JSON.stringify({ isActive: !isActive }),
             });
 
             if (!response.ok) {
@@ -172,7 +185,12 @@ export default function TestimonialsManagement() {
                                     <td>{renderRatingStars(testimonial.rating)}</td>
                                     <td>
                                         <button
-                                            onClick={() => handleToggleStatus(testimonial._id, testimonial.isActive)}
+                                            onClick={() =>
+                                                handleToggleStatus(
+                                                    testimonial._id,
+                                                    testimonial.isActive
+                                                )
+                                            }
                                             className={`status-button ${testimonial.isActive ? 'active' : 'inactive'}`}
                                             title={testimonial.isActive ? 'Active' : 'Inactive'}
                                         >
@@ -211,14 +229,16 @@ export default function TestimonialsManagement() {
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 <TestimonialForm
-                    initialValues={currentTestimonial || {
-                        name: '',
-                        email: '',
-                        position: '',
-                        rating: 5,
-                        message: '',
-                        isActive: true
-                    }}
+                    initialValues={
+                        currentTestimonial || {
+                            name: '',
+                            email: '',
+                            position: '',
+                            rating: 5,
+                            message: '',
+                            isActive: true,
+                        }
+                    }
                     onSubmit={handleSubmit}
                     onCancel={() => setIsModalOpen(false)}
                 />

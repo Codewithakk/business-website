@@ -1,7 +1,7 @@
-// components/UI/Modal.js
+
 import React from 'react';
 import ReactDOM from 'react-dom';
-import '../../styles/Modal.css'; // New: make sure you add this file
+import '../../styles/Modal.css'
 
 export default function Modal({ isOpen, onClose, children }) {
     if (!isOpen) return null;
@@ -18,6 +18,6 @@ export default function Modal({ isOpen, onClose, children }) {
                 {children}
             </div>
         </div>,
-        document.getElementById('modal-root') // Make sure you have <div id="modal-root"></div> in your HTML!
+        document.getElementById('modal-root')
     );
 }

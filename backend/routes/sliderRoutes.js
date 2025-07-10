@@ -10,7 +10,7 @@ router.get('/', sliderController.getAllSlides);
 router.get('/:id', sliderController.getSlideById);
 
 // Protected routes (require authentication)
-// router.use(authMiddleware.protect);
+router.use(authMiddleware.protect);
 
 router.post('/', sliderValidator.createSlide, validateRequest, sliderController.createSlide);
 router.put('/:id', sliderValidator.updateSlide, validateRequest, sliderController.updateSlide);

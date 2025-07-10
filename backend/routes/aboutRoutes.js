@@ -9,7 +9,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 router.get('/', aboutController.getAboutContent);
 
 // Protected route (require authentication)
-// router.use(authMiddleware.protect);
+router.use(authMiddleware.protect);
 router.put('/', aboutValidator.updateAboutContent, validateRequest, aboutController.updateAboutContent);
 
 module.exports = router;
